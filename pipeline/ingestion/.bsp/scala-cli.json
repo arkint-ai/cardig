@@ -1,0 +1,16 @@
+{
+  "name": "scala-cli",
+  "argv": [
+    "/usr/bin/scala-cli",
+    "bsp",
+    "--json-options",
+    "/home/rodfer/workspace/cardig/pipeline/ingestion/.scala-build/ide-options-v2.json",
+    "/home/rodfer/workspace/cardig/pipeline/ingestion"
+  ],
+  "version": "1.2.1",
+  "bspVersion": "2.1.1",
+  "languages": [
+    "scala",
+    "java"
+  ]
+}
