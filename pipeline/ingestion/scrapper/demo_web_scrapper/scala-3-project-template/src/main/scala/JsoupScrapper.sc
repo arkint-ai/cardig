@@ -1,4 +1,5 @@
-import $ivy.`org.jsoup:jsoup:1.15.4`
+// https://jsoup.org/apidocs/org/jsoup/Jsoup.html
+import $ivy.`org.jsoup:jsoup:1.18.1`
 import org.jsoup._
 import scala.jdk.CollectionConverters._
 
@@ -16,8 +17,8 @@ val otds = for(otd <- onThisDay.asScala) yield (otd.attr("title"), otd.attr("hre
 otds.foreach { case (title, href) =>
   println(s"Title: $title, Href: $href")
 }
+println(otds.mkString("\n"))
 
 val headers = for (otd <- onThisDay.asScala) yield otd.text 
-headers.foreach { case (header) =>
-  println(s"Header: $header")
-}
+headers.foreach(header => println(s"Header: $header"))
+println(headers.mkString("\n"))

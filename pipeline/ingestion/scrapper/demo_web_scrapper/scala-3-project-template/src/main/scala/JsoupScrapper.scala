@@ -1,7 +1,7 @@
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-object Scraper {
+object JsoupScraper {
   def scrapeWebsite(url: String): Document = {
     val doc = Jsoup.connect(url).get()
     doc

@@ -4,6 +4,9 @@
 
 Clean up data and load to storage
 
+Can use this to model processing categories, for storage and analytics
+https://www.standvirtual.com/api/doc/#api-Categories
+
 Data will be raw and has to be trimmed and categorised into what really matter
 
 Will come from scheduled spark jobs that run the scrapper scripts
