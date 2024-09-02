@@ -1,0 +1,28 @@
+[Unit]
+Description=cardig
+After=network.target
+
+[Service]
+User=webmaster
+Group=webmaster
+
+#WorkingDirectory=/path/to/sbt/dir
+#ExecStart=/usr/bin/sbt run
+WorkingDirectory=/path/to/jar/bin
+ExecStart=/usr/bin/java -jar
+
+Restart=always
+RestartSec=10
+
+LimitNOFILE=65536
+LimitNPROC=1024
+
+StandardOutput=journal
+StandardError=journal
+
+Environment=JAVA_HOME=/path/to/java
+Environment=PATH=/usr/bin:/usr/local/bin 
+
+[Install]
+WantedBy=multi-user.target
+
