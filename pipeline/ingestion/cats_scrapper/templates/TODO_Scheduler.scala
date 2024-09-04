@@ -25,7 +25,7 @@ object ScraperScheduler {
     val system: ActorSystem = ActorSystem("ScraperSystem")
 
     val scheduler1: Cancellable = system.scheduler.scheduleAtFixedRate(
-      initialDelay = 4.seconds, 
+      initialDelay = 4.seconds,
       interval = 4.seconds
     )(() => Future(scraper1()))
 
@@ -46,4 +46,3 @@ object ScraperScheduler {
     scheduler3.cancel()
   }
 }
-
