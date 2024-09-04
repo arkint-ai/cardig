@@ -1,4 +1,4 @@
-.bsp 
-.metals 
-.scala-build
-scrapper
+*.bsp 
+*.bloop
+*.metals 
+*.scala-build

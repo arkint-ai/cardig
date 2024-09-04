@@ -9,6 +9,10 @@ https://www.zenrows.com/blog/scala-web-scraping
 --- Example code
 https://github.com/KadekM/scrawler
 
+-- Docs code
+https://typelevel.org/cats/
+https://typelevel.org/cats-effect/
+
 ````
 
 
