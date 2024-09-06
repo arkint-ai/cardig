@@ -10,7 +10,8 @@ lazy val root = project
     libraryDependencies ++= Seq(
       "org.jsoup"      % "jsoup"       % "1.18.1",
       "org.typelevel" %% "cats-core"   % "2.9.0",
-      "org.typelevel" %% "cats-effect" % "3.4.0"
+      "org.typelevel" %% "cats-effect" % "3.4.0",
+      "co.fs2"        %% "fs2-core"    % "3.10.2"
     ),
     scalacOptions ++= Seq("-explain")
   )
