@@ -6,9 +6,13 @@ import cats.Traverse
 import cats.implicits._
 
 object Scrapper {
-  def fetchProducts(baseUrl: String, pageNumber: Int): IO[Unit] = {
-    if (pageNumber == 420) {
-      IO(println(s"Reached page number limit of 420."))
+  def fetchProducts(
+      baseUrl: String,
+      pageNumber: Int
+  ): IO[List[(Option[Throwable], Option[String])]] = {
+    // TODO: this s probly useless at this point, remove 
+    if (pageNumber == 42) {
+      IO.pure(List.empty)
     } else {
       val pageValue = s"&pag=$pageNumber"
       val url       = baseUrl + pageValue
@@ -16,32 +20,45 @@ object Scrapper {
         case Right(doc) =>
           val products = doc.select(".car-card-info").asScala.toList
           if (products.isEmpty) {
-            IO(println(s"No products found on page $pageNumber."))
+            IO.pure(List.empty)
           } else {
             Traverse[List]
               .traverse(products) { product =>
                 val productTitle = product.select("h3").text()
-                IO(println(productTitle))
+                IO.pure((None, Some(productTitle)))
               }
-              .void
-              .flatMap { _ =>
+              .flatMap { productResults =>
                 val nextPageLink =
                   doc.select("div.pagination-next a[title='NEXT']")
                 if (nextPageLink.isEmpty) {
-                  IO(println(s"No more pages after page $pageNumber."))
+                  IO.pure(productResults)
                 } else {
                   fetchProducts(baseUrl, pageNumber + 1)
+                    .map(nextPageResults => productResults ++ nextPageResults)
                 }
               }
           }
         case Left(e: HttpStatusException) if e.getStatusCode == 403 =>
-          IO(println(s"[403] - Forbidden at page $pageNumber."))
+          IO.pure(
+            List(
+              (
+                Some(new Exception(s"[403] Forbidden at page $pageNumber")),
+                None
+              )
+            )
+          )
         case Left(e: HttpStatusException) if e.getStatusCode == 400 =>
-          IO(println(s"[400] - Bad Request at page $pageNumber."))
+          IO.pure(
+            List(
+              (
+                Some(new Exception(s"[400] Bad Request at page $pageNumber")),
+                None
+              )
+            )
+          )
         case Left(e) =>
-          IO(println(s"[ERROR] - ${e.getMessage}"))
+          IO.pure(List((Some(e), None)))
       }
     }
   }
-
 }
