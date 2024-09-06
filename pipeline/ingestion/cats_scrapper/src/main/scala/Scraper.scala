@@ -7,6 +7,9 @@ import cats.effect.{IO, Resource}
 
 import fs2.Stream
 
+// TODO: replace jsoup with this
+// https://github.com/ruippeixotog/scala-scraper
+// TODO: cats logger to stdout instead of println
 object Scraper {
 
   def fetchProducts(
