@@ -1,70 +1,55 @@
 import org.jsoup._
+import org.jsoup.nodes.Document 
+import org.jsoup.nodes.Element
 import org.jsoup.HttpStatusException
 
 import scala.jdk.CollectionConverters._
 
 import cats.effect.{IO, Resource}
 
-import fs2.Stream
 
-// TODO: replace jsoup with this
-// https://github.com/ruippeixotog/scala-scraper
-// TODO: cats logger to stdout instead of println
 object Scraper {
+  def fetchProducts(doc: Document): List[Element] = {
+    doc.select(".car-card-info").asScala.toList
+  }
 
-  def fetchProducts(
+  def selectProductTitles(products: List[Element]): List[String] = {
+    products.collect {
+      case product if product.select("h3").text().nonEmpty => product.select("h3").text()
+    }
+  }
+ 
+  def scrapeProducts(
       baseUrl: String,
       pageNumber: Int
-  ): Stream[IO, String] = {
+  ): IO[List[String]] = {
 
     val pageValue: String = s"&pag=$pageNumber"
     val url: String       = baseUrl + pageValue
-
-    Stream
-      .resource(createConnection(url))
-      .flatMap { doc =>
-        val products      = doc.select(".car-card-info").asScala.toList
-        val productTitles = products.map(_.select("h3").text())
-
-        val nextPageLink   = doc.select("div.pagination-next a[title='NEXT']")
-        val nextPageNumber = pageNumber + 1
-
-        val noMoreProducts =
-          products.isEmpty || productTitles.isEmpty || nextPageLink.isEmpty
-        if (noMoreProducts) {
-          Stream.eval(
-            IO.println(s"[LOGGER] No more pages after $pageNumber for $baseUrl")
-          ) >>
-            Stream.emits(productTitles)
+    val nextPageNumber = pageNumber + 1
+   
+    connection(url).use { doc => 
+      for {
+        products <- IO(fetchProducts(doc))
+        productTitles <- IO(selectProductTitles(products))
+        _ <- IO { println(s"[LOGGER] Found ${productTitles.size} products on page $pageNumber") }
+        
+        productsAcc <- if (productTitles.nonEmpty) {
+          scrapeProducts(baseUrl, pageNumber + 1).map(nextPageProducts => productTitles ++ nextPageProducts)
         } else {
-          Stream.emits(productTitles) ++ fetchProducts(baseUrl, nextPageNumber)
+          IO.pure(List.empty[String])
         }
-      }
-      .handleErrorWith {
-        case e: HttpStatusException if e.getStatusCode == 403 =>
-          Stream
-            .eval(
-              IO.println(s"[LOGGER] Error 403 - Forbidden at page $pageNumber")
-            )
-            .drain
-        case e: HttpStatusException if e.getStatusCode == 400 =>
-          Stream
-            .eval(
-              IO.println(
-                s"[LOGGER] Error 400 - Bad Request at page $pageNumber"
-              )
-            )
-            .drain
-        case e =>
-          Stream.eval(IO.println(s"[LOGGER] Error Unknown - $e")).drain
-      }
+      } yield productsAcc
+    }.handleErrorWith {
+      case e: HttpStatusException => IO { println(s"[LOGGER] Error ${e.getStatusCode}: ${e.getMessage}") } >> IO.pure(List.empty[String]) 
+      case e => IO { println(s"[LOGGER] Error: ${e.getMessage}") } >> IO.pure(List.empty[String]) 
+    }
   }
 
-  private def createConnection(
-      url: String
-  ): Resource[IO, org.jsoup.nodes.Document] =
+  def connection(url: String): Resource[IO, org.jsoup.nodes.Document] =
     Resource.make(
-      IO(Jsoup.connect(url).get())
-    )(_ => IO.println(s"[LOGGER] Closed connection for $url"))
+      IO { println(s"[LOGGER] Estabilishing connection on $url") }
+      .flatMap(_ => IO { Jsoup.connect(url).get() } )
+    )(_ => IO { println(s"[LOGGER] Closed connection on $url") } )
 
 }
