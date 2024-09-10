@@ -8,8 +8,8 @@ object Main extends IOApp.Simple {
 
   def scraper: IO[Unit] = {
     for {
-      products <- Scraper.scrapeProducts(bmwUrl, 1) 
-      _ <- IO { products.foreach(println) }
+      products <- Scraper.scrapeProducts(bmwUrl, 1)
+      _        <- IO { products.foreach(println) }
     } yield ()
   }
 
