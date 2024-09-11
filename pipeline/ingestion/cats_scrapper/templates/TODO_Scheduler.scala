@@ -7,6 +7,8 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.Behaviors
 
+// https://typelevel.org/cats-effect/docs/2.x/datatypes/fiber
+
 object ScraperScheduler {
 
   def scraper1(): Unit = {
