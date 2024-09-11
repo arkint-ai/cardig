@@ -48,7 +48,7 @@ object Scraper {
               scrapeProducts(baseUrl, pageNumber + 1)
                 .map(nextPageProducts => productTitles ++ nextPageProducts)
             } else {
-              IO.pure { List.empty[String] }
+              IO.pure { List.empty[String] } 
             }
         } yield productsAcc
       }
@@ -63,7 +63,7 @@ object Scraper {
           )
       }
   }
-
+  
   def connection(url: String): Resource[IO, Document] =
     Resource.make(
       IO { println(s"[LOGGER] Estabilishing connection on $url") }
