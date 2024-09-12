@@ -7,8 +7,11 @@ import scala.jdk.CollectionConverters._
 
 import cats.effect.{IO, Resource}
 
+// TODO: make URL a type not String
+// https://github.com/lemonlabsuk/scala-uri
+
 object Scraper {
-  def fetchProducts(doc: Document): List[Element] = {
+  def selectProducts(doc: Document): List[Element] = {
     doc.select(".car-card-info").asScala.toList
   }
 
@@ -21,34 +24,34 @@ object Scraper {
       .collect { case Some(productTitle) =>
         productTitle
       }
+  }
 
+  def buildPageURL(baseURL: String, pageNumber: Int): String = {
+    baseURL + s"&pag=${pageNumber}"
   }
 
   def scrapeProducts(
-      baseUrl: String,
-      pageNumber: Int
+      baseURL: String,
+      pageNumber: Int = 1
   ): IO[List[String]] = {
 
-    val pageValue: String = s"&pag=$pageNumber"
-    val url: String       = baseUrl + pageValue
-    val nextPageNumber    = pageNumber + 1
+    val pageURL: String = buildPageURL(baseURL, pageNumber)
 
-    connection(url)
+    fetchPage(pageURL)
       .use { doc =>
-        val products      = fetchProducts(doc)
-        val productTitles = selectProductTitles(products)
+        val productTitles = selectProductTitles(selectProducts(doc))
         for {
           productsAcc <-
             if (productTitles.nonEmpty) {
               IO {
                 println(
-                  s"[LOGGER] Found ${productTitles.size} products on $url"
+                  s"[LOGGER] Found ${productTitles.size} products on ${pageURL}"
                 )
-              } >>
-              scrapeProducts(baseUrl, pageNumber + 1)
-                .map(nextPageProducts => productTitles ++ nextPageProducts)
+              } *>
+                scrapeProducts(baseURL, pageNumber + 1)
+                  .map(nextPageProductTitles => productTitles ++ nextPageProductTitles)
             } else {
-              IO.pure { List.empty[String] } 
+              IO.pure { List.empty[String] }
             }
         } yield productsAcc
       }
@@ -56,18 +59,21 @@ object Scraper {
         case e: HttpStatusException =>
           IO {
             println(s"[LOGGER] Error ${e.getStatusCode}: ${e.getMessage}")
-          } >> IO.pure(List.empty[String])
+          } *> IO.pure(List.empty[String])
         case e =>
-          IO { println(s"[LOGGER] Error: ${e.getMessage}") } >> IO.pure(
+          IO { println(s"[LOGGER] Error: ${e.getMessage}") } *> IO.pure(
             List.empty[String]
           )
       }
   }
-  
-  def connection(url: String): Resource[IO, Document] =
-    Resource.make(
-      IO { println(s"[LOGGER] Estabilishing connection on $url") }
-        .flatMap(_ => IO { Jsoup.connect(url).get() })
-    )(_ => IO { println(s"[LOGGER] Closed connection on $url") })
+
+  def fetchPage(pageURL: String): Resource[IO, Document] = {
+    Resource.make(IO {
+      println(s"[LOGGER] Estabilishing connection on $pageURL")
+    }
+      *> IO { Jsoup.connect(pageURL).get() })(_ =>
+      IO { println(s"[LOGGER] Closed connection on $pageURL") }
+    )
+  }
 
 }
