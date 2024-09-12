@@ -7,8 +7,14 @@ import scala.jdk.CollectionConverters._
 
 import cats.effect.{IO, Resource}
 
-// TODO: make URL a type not String
+// TODO: 
+// Make URL a type not String
 // https://github.com/lemonlabsuk/scala-uri
+
+// TODO:
+// Replace IO with cats logger 
+// https://typelevel.org/log4cats/
+
 
 object Scraper {
   def selectProducts(doc: Document): List[Element] = {
