@@ -7,14 +7,13 @@ import scala.jdk.CollectionConverters._
 
 import cats.effect.{IO, Resource}
 
-// TODO: 
+// TODO:
 // Make URL a type not String
 // https://github.com/lemonlabsuk/scala-uri
 
 // TODO:
-// Replace IO with cats logger 
+// Replace IO with cats logger
 // https://typelevel.org/log4cats/
-
 
 object Scraper {
   def selectProducts(doc: Document): List[Element] = {
@@ -55,7 +54,9 @@ object Scraper {
                 )
               } *>
                 scrapeProducts(baseURL, pageNumber + 1)
-                  .map(nextPageProductTitles => productTitles ++ nextPageProductTitles)
+                  .map(nextPageProductTitles =>
+                    productTitles ++ nextPageProductTitles
+                  )
             } else {
               IO.pure { List.empty[String] }
             }

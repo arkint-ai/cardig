@@ -1,18 +1,17 @@
 import cats.effect.{IO, IOApp}
+import cats.implicits.toTraverseOps
 
 object Main extends IOApp.Simple {
 
   def scraper: IO[Unit] = {
     val bmwURL: String =
       "https://www.standvirtual.com/carros-novos/pesquisar/bmw/?OT=1"
-    !
-    // TODO:
-    // Why is this printing a List instead individual Strings?
-    Scraper
-      .scrapeProducts(bmwURL)
-      .flatMap(productTitle => IO.println(productTitle))
 
+    for {
+      productTitles <- Scraper.scrapeProducts(bmwURL)
+      _ <- productTitles.traverse(title => IO { println(title) }) 
+    } yield ()
   }
 
-  override def run: IO[Unit] = scraper
+  def run: IO[Unit] = scraper
 }
