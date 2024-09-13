@@ -9,7 +9,7 @@ object Main extends IOApp.Simple {
 
     for {
       productTitles <- Scraper.scrapeProducts(bmwURL)
-      _ <- productTitles.traverse(title => IO { println(title) }) 
+      _             <- productTitles.traverse(title => IO { println(title) })
     } yield ()
   }
 
