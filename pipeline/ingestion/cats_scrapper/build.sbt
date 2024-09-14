@@ -11,7 +11,9 @@ lazy val root = project
       "org.jsoup"      % "jsoup"       % "1.18.1",
       "org.typelevel" %% "cats-core"   % "2.9.0",
       "org.typelevel" %% "cats-effect" % "3.4.0",
-      "co.fs2"        %% "fs2-core"    % "3.10.2"
+      "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
+      "org.slf4j" % "slf4j-api" % "2.0.16",
+      "ch.qos.logback" % "logback-classic" % "1.5.6"
     ),
     scalacOptions ++= Seq("-explain")
   )

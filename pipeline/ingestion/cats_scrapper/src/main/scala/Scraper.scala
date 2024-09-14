@@ -7,15 +7,15 @@ import scala.jdk.CollectionConverters._
 
 import cats.effect.{IO, Resource}
 
+import com.typesafe.scalalogging.LazyLogging
+//import org.slf4j.LoggerFactory
+
 // TODO:
 // Make URL a type not String
 // https://github.com/lemonlabsuk/scala-uri
 
-// TODO:
-// Replace IO with cats logger
-// https://typelevel.org/log4cats/
+object Scraper extends LazyLogging {
 
-object Scraper {
   def selectProducts(doc: Document): List[Element] = {
     doc.select(".car-card-info").asScala.toList
   }
@@ -48,15 +48,11 @@ object Scraper {
         for {
           productsAcc <-
             if (productTitles.nonEmpty) {
-              IO {
-                println(
-                  s"[LOGGER] Found ${productTitles.size} products on ${pageURL}"
+              logger.info(s"Found ${productTitles.size} products on ${pageURL}")
+              scrapeProducts(baseURL, pageNumber + 1)
+                .map(nextPageProductTitles =>
+                  productTitles ++ nextPageProductTitles
                 )
-              } *>
-                scrapeProducts(baseURL, pageNumber + 1)
-                  .map(nextPageProductTitles =>
-                    productTitles ++ nextPageProductTitles
-                  )
             } else {
               IO.pure { List.empty[String] }
             }
@@ -64,23 +60,25 @@ object Scraper {
       }
       .handleErrorWith {
         case e: HttpStatusException =>
-          IO {
-            println(s"[LOGGER] Error ${e.getStatusCode}: ${e.getMessage}")
-          } *> IO.pure(List.empty[String])
+          logger.error(s"Error: ${e.getStatusCode}: ${e.getMessage}")
+           IO.pure(List.empty[String])
         case e =>
-          IO { println(s"[LOGGER] Error: ${e.getMessage}") } *> IO.pure(
-            List.empty[String]
-          )
+          logger.error(s"Error: ${e.getMessage}")
+          IO.pure(List.empty[String])
       }
   }
 
   def fetchPage(pageURL: String): Resource[IO, Document] = {
-    Resource.make(IO {
-      println(s"[LOGGER] Estabilishing connection on $pageURL")
+    Resource.make {
+      IO {
+        logger.debug(s"Establishing connection on $pageURL")
+        Jsoup.connect(pageURL).get()
+      }
+    } { _ =>
+      IO {
+        logger.debug(s"Closed connection on $pageURL")
+      }
     }
-      *> IO { Jsoup.connect(pageURL).get() })(_ =>
-      IO { println(s"[LOGGER] Closed connection on $pageURL") }
-    )
   }
 
 }
