@@ -12,6 +12,18 @@ object Main extends IOApp.Simple {
       _             <- productTitles.traverse(title => IO { println(title) })
     } yield ()
   }
+  def test: IO[Unit] = {
+    Scraper
+      .fetchPage("https://archlinux.org/")
+      .use { doc =>
+        val title     = Scraper.selectDocElements(doc, "h1")
+        val titleText = Scraper.selectElementsText(title, "h1")
+        IO {
+          println(title.head)
+          println(titleText.head)
+        }
+      }
+  }
 
-  def run: IO[Unit] = scraper
+  def run: IO[Unit] = test
 }

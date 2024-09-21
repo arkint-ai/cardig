@@ -10,7 +10,13 @@ https://jsoup.org/
 
 // TODO: replace jsoup with this
 // https://github.com/ruippeixotog/scala-scraper
-// TODO: cats logger to stdout instead of println
+
+// TODO: make URL a type not String
+
+// TODO: add tests
+// https://scalameta.org/munit/docs/integrations/scalacheck.html
+// https://scalameta.org/munit/docs/getting-started.html
+
 ````
 
 ## Examples

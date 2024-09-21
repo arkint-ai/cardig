@@ -8,31 +8,26 @@ import scala.jdk.CollectionConverters._
 import cats.effect.{IO, Resource}
 
 import com.typesafe.scalalogging.LazyLogging
-//import org.slf4j.LoggerFactory
 
 // TODO:
 // Make URL a type not String
 // https://github.com/lemonlabsuk/scala-uri
 
 object Scraper extends LazyLogging {
-
-  def selectProducts(doc: Document): List[Element] = {
-    doc.select(".car-card-info").asScala.toList
+  // NOTE: tags can be HTML tags (like h1), classes (.something) and such
+  def selectDocElements(doc: Document, tag: String): List[Element] = {
+    doc.select(tag).asScala.toList
   }
 
-  def selectProductTitles(products: List[Element]): List[String] = {
-    products
-      .map { product =>
-        val productTitle = product.select("h3").text()
-        if (productTitle.nonEmpty) Some(productTitle) else None
+  def selectElementsText(elements: List[Element], tag: String): List[String] = {
+    elements
+      .map { element =>
+        val elementText = element.select(tag).text()
+        if (elementText.nonEmpty) Some(elementText) else None
       }
-      .collect { case Some(productTitle) =>
-        productTitle
+      .collect { case Some(elementText) =>
+        elementText
       }
-  }
-
-  def buildPageURL(baseURL: String, pageNumber: Int): String = {
-    baseURL + s"&pag=${pageNumber}"
   }
 
   def scrapeProducts(
@@ -40,11 +35,16 @@ object Scraper extends LazyLogging {
       pageNumber: Int = 1
   ): IO[List[String]] = {
 
-    val pageURL: String = buildPageURL(baseURL, pageNumber)
+    val pageURL: String             = baseURL + s"&pag=${pageNumber}"
+    val titlesCardInfoClass: String = ".car-card-info"
+    val titlesTextTag: String       = "h3"
 
     fetchPage(pageURL)
       .use { doc =>
-        val productTitles = selectProductTitles(selectProducts(doc))
+        val productTitles = selectElementsText(
+          selectDocElements(doc, titlesTextTag),
+          titlesCardInfoClass
+        )
         for {
           productsAcc <-
             if (productTitles.nonEmpty) {
@@ -61,7 +61,7 @@ object Scraper extends LazyLogging {
       .handleErrorWith {
         case e: HttpStatusException =>
           logger.error(s"Error: ${e.getStatusCode}: ${e.getMessage}")
-           IO.pure(List.empty[String])
+          IO.pure(List.empty[String])
         case e =>
           logger.error(s"Error: ${e.getMessage}")
           IO.pure(List.empty[String])
