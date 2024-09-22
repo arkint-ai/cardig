@@ -6,7 +6,8 @@ lazy val root = project
     name                                   := "cats_scrapper",
     version                                := "0.0.1",
     scalaVersion                           := scala3Version,
-    libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test,
+    //libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test,
+    libraryDependencies += "org.typelevel" %% "munit-cats-effect" % "2.0.0" % "test",
     libraryDependencies ++= Seq(
       "org.jsoup"                   % "jsoup"           % "1.18.1",
       "org.typelevel"              %% "cats-core"       % "2.9.0",

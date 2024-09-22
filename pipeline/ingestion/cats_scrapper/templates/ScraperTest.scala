@@ -1,10 +1,8 @@
 // For more information on writing tests, see
 // https://scalameta.org/munit/docs/getting-started.html
 import org.jsoup.nodes.Document
-
-import munit.CatsEffectSuite
-
 import cats.effect.{IO, SyncIO}
+import munit.CatsEffectSuite
 
 class ScraperTest extends munit.CatsEffectSuite {
   test("fetchPage connection") {
@@ -19,7 +17,7 @@ class ScraperTest extends munit.CatsEffectSuite {
   test("selectDocElements") {
     Scraper.fetchPage("https://archlinux.org/").use { doc =>
       val title = Scraper.selectDocElements(doc, "h1")
-      val expectedHtml =
+      val expectedHtml = 
         "<h1><a href=\"/\" title=\"Return to the main page\">Arch Linux</a></h1>"
       IO {
         assert(title.nonEmpty, "An h1 element should be found")
@@ -30,9 +28,9 @@ class ScraperTest extends munit.CatsEffectSuite {
 
   test("selectElementstext") {
     Scraper.fetchPage("https://archlinux.org/").use { doc =>
-      val titleText =
+      val titleText = 
         Scraper.selectElementsText(Scraper.selectDocElements(doc, "h1"), "h1")
-      val expectedText = "Arch Linux"
+      val expectedText = "Arch Linux LOL"
       IO {
         assert(titleText.nonEmpty, "An h1 element should be found")
         assertEquals(titleText.head, expectedText)
