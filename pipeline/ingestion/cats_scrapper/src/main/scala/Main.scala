@@ -4,7 +4,7 @@ import cats.implicits._
 object Main extends IOApp.Simple {
   def scrapeIt(url: String, filePath: String): IO[Unit] = {
     for {
-      productTitles <- Scraper.scrapeProducts(url)
+      productTitles <- StandvirtualScraper.scrapeProducts(url)
       _             <- FileIO.write(filePath, productTitles)
       _             <- IO.println(s"[MAIN] $url data written to $filePath")
     } yield ()

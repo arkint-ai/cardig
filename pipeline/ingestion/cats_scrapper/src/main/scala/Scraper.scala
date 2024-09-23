@@ -12,7 +12,7 @@ import com.typesafe.scalalogging.LazyLogging
 // TODO: Make URL a type not String
 // https://github.com/lemonlabsuk/scala-uri
 
-object Scraper extends LazyLogging {
+trait ScraperCore extends LazyLogging {
   // NOTE: tags can be HTML tags (like h1), classes (.something) and such
   def selectDocElements(doc: Document, tag: String): List[Element] = {
     doc.select(tag).asScala.toList
@@ -29,6 +29,26 @@ object Scraper extends LazyLogging {
       }
   }
 
+  def fetchPage(pageURL: String): Resource[IO, Document] = {
+    // TODO: should this be async? How? Where?
+    Resource.make {
+      IO {
+        logger.debug(s"Establishing connection on $pageURL")
+        Jsoup.connect(pageURL).get()
+      }
+    } { _ =>
+      IO {
+        logger.debug(s"Closed connection on $pageURL")
+      }
+    }
+  }
+
+}
+
+object Scraper extends ScraperCore
+
+object StandvirtualScraper extends ScraperCore {
+  
   def scrapeProducts(
       baseURL: String,
       pageNumber: Int = 1
@@ -67,18 +87,6 @@ object Scraper extends LazyLogging {
       }
   }
 
-  def fetchPage(pageURL: String): Resource[IO, Document] = {
-    // TODO: should this be async? How? Where?
-    Resource.make {
-      IO {
-        logger.debug(s"Establishing connection on $pageURL")
-        Jsoup.connect(pageURL).get()
-      }
-    } { _ =>
-      IO {
-        logger.debug(s"Closed connection on $pageURL")
-      }
-    }
-  }
 
 }
+
