@@ -3,10 +3,10 @@ val scala3Version = "3.5.0"
 lazy val root = project
   .in(file("."))
   .settings(
-    name                                   := "cats_scrapper",
-    version                                := "0.0.1",
-    scalaVersion                           := scala3Version,
-    //libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test,
+    name         := "cats_scrapper",
+    version      := "0.0.1",
+    scalaVersion := scala3Version,
+    // libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test,
     libraryDependencies += "org.typelevel" %% "munit-cats-effect" % "2.0.0" % "test",
     libraryDependencies ++= Seq(
       "org.jsoup"                   % "jsoup"           % "1.18.1",

@@ -9,8 +9,7 @@ import cats.effect.{IO, Resource}
 
 import com.typesafe.scalalogging.LazyLogging
 
-// TODO:
-// Make URL a type not String
+// TODO: Make URL a type not String
 // https://github.com/lemonlabsuk/scala-uri
 
 object Scraper extends LazyLogging {
@@ -42,8 +41,8 @@ object Scraper extends LazyLogging {
     fetchPage(pageURL)
       .use { doc =>
         val productTitles = selectElementsText(
-          selectDocElements(doc, titlesTextTag),
-          titlesCardInfoClass
+          selectDocElements(doc, titlesCardInfoClass),
+          titlesTextTag
         )
         for {
           productsAcc <-
@@ -69,6 +68,7 @@ object Scraper extends LazyLogging {
   }
 
   def fetchPage(pageURL: String): Resource[IO, Document] = {
+    // TODO: should this be async? How? Where?
     Resource.make {
       IO {
         logger.debug(s"Establishing connection on $pageURL")
