@@ -12,7 +12,7 @@ import com.typesafe.scalalogging.LazyLogging
 // TODO: Make URL a type not String
 // https://github.com/lemonlabsuk/scala-uri
 
-trait ScraperCore extends LazyLogging {
+trait Scraper extends LazyLogging {
   // NOTE: tags can be HTML tags (like h1), classes (.something) and such
   def selectDocElements(doc: Document, tag: String): List[Element] = {
     doc.select(tag).asScala.toList
@@ -45,9 +45,9 @@ trait ScraperCore extends LazyLogging {
 
 }
 
-object Scraper extends ScraperCore
+object Scraper extends Scraper
 
-object StandvirtualScraper extends ScraperCore {
+object StandvirtualScraper extends Scraper {
   
   def scrapeProducts(
       baseURL: String,
