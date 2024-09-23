@@ -13,7 +13,7 @@ object Main extends IOApp.Simple {
   def run: IO[Unit] = {
     val bmwURL = "https://www.standvirtual.com/carros-novos/pesquisar/bmw/?OT=1"
     val bmwFile = "/tmp/bmw_titles.txt"
-    
+
     scrapeIt(bmwURL, bmwFile)
   }
 

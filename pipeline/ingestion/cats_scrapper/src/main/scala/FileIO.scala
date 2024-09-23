@@ -6,34 +6,37 @@ import java.nio.charset.StandardCharsets
 
 object FileIO {
   def write(filePath: String, content: List[String]): IO[Unit] = {
-    Resource.fromAutoCloseable(
-      IO {
-        Files.newBufferedWriter(
-          Paths.get(filePath), 
-          StandardCharsets.UTF_8, 
-          StandardOpenOption.CREATE, 
-          StandardOpenOption.WRITE
-        ) 
-      }
-    ).use { writer =>
-      content.traverse_ { line =>
+    Resource
+      .fromAutoCloseable(
         IO {
-          writer.write(line)
-          writer.newLine()
+          Files.newBufferedWriter(
+            Paths.get(filePath),
+            StandardCharsets.UTF_8,
+            StandardOpenOption.CREATE,
+            StandardOpenOption.WRITE
+          )
+        }
+      )
+      .use { writer =>
+        content.traverse_ { line =>
+          IO {
+            writer.write(line)
+            writer.newLine()
+          }
         }
       }
-    }
   }
 
   def read(filePath: String): IO[List[String]] = {
-    Resource.fromAutoCloseable(
-      IO { 
+    Resource
+      .fromAutoCloseable(IO {
         Files.newBufferedReader(Paths.get(filePath), StandardCharsets.UTF_8)
-    }).use { reader =>
-      IO {
-        reader.lines().toArray.toList.asInstanceOf[List[String]]
+      })
+      .use { reader =>
+        IO {
+          reader.lines().toArray.toList.asInstanceOf[List[String]]
+        }
       }
-    }
   }
 
 }

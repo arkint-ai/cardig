@@ -48,7 +48,7 @@ trait Scraper extends LazyLogging {
 object Scraper extends Scraper
 
 object StandvirtualScraper extends Scraper {
-  
+
   def scrapeProducts(
       baseURL: String,
       pageNumber: Int = 1
@@ -87,6 +87,4 @@ object StandvirtualScraper extends Scraper {
       }
   }
 
-
 }
-
