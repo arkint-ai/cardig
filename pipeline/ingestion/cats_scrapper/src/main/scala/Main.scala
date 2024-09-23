@@ -7,7 +7,6 @@ object Main extends IOApp.Simple {
       productTitles <- Scraper.scrapeProducts(url)
       _             <- FileIO.write(filePath, productTitles)
       _             <- IO.println(s"[MAIN] $url data written to $filePath")
-      _             <- IO.println(FileIO.read(filePath))
     } yield ()
   }
 
