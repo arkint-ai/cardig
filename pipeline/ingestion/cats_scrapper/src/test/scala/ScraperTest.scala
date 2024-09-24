@@ -23,7 +23,7 @@ class ScraperTest extends munit.CatsEffectSuite {
         "<h1><a href=\"/\" title=\"Return to the main page\">Arch Linux</a></h1>"
       IO {
         assert(title.nonEmpty, "An h1 element should be found")
-        assertEquals(title.head.toString.trim, expectedHtml.trim)
+        assertEquals(title.head.toString, expectedHtml)
       }
     }
   }
