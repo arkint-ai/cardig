@@ -20,13 +20,11 @@ https://jsoup.org/
 ````
 
 ````
-API pwned
-https://www.standvirtual.com/api/v1/search?app_iphone=1&json=1&page=2&search[category_id]=29&search[filter_enum_make]=bmw&search[filter_float_price:dec]=33000
+API found 
+actually dont need the phone param
 search params are in the request json data, in case need to be adjusted
 just write business logic code for calling the API, leave the scraper apart for now
 https://www.standvirtual.com/api/v1/search?app_iphone=1&json=1&page=2&search[category_id]=29&search[filter_enum_make]=bmw&search[filter_float_price:dec]=33000
-actually dont need the phone param
-
 ````
 
 ## Examples
