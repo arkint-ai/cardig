@@ -37,7 +37,7 @@ object StandvirtualScraper extends Scraper {
   ): IO[List[String]] = {
     
     val pageURL = baseURL + s"?page=${pageNumber}" 
-
+ 
     fetchPage(pageURL)
       .use { doc =>
         val productTitles = selectNewModelsTitles(doc)
